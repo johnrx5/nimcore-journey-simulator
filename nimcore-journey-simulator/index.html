@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NimCore® 90-Day Patient Journey Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .timeline-line {
+            background: linear-gradient(to right, #3b82f6, #a78bfa, #f472b6);
+        }
+        .modal-backdrop {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">NimCore® Patient Journey</h1>
+            <p class="text-slate-600 mt-2 text-lg">An interactive 90-day simulation of our data-driven care process.</p>
+        </header>
+
+        <!-- Patient Profile -->
+        <div id="patient-profile" class="bg-white p-6 rounded-xl shadow-md border border-slate-200 mb-12 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-semibold mb-4 text-slate-900">Patient Profile</h2>
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                    JD
+                </div>
+                <div>
+                    <p class="font-bold text-xl">John Doe, Age 42</p>
+                    <p class="text-slate-500">Selected Protocol: <span class="font-semibold text-blue-600">V-Vital + T-TrimCore</span></p>
+                    <p class="text-slate-500">Goals: <span class="font-semibold text-slate-700">Increase Energy, Optimize Metabolism</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="relative">
+            <!-- The line -->
+            <div class="h-1 timeline-line absolute top-1/2 left-0 right-0 -translate-y-1/2"></div>
+            
+            <!-- Timeline Events -->
+            <div id="timeline-events" class="relative flex justify-between">
+                <!-- Events will be injected here by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="event-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop bg-black bg-opacity-50 opacity-0 pointer-events-none">
+        <div class="modal-content bg-white w-full max-w-2xl rounded-xl shadow-2xl transform scale-95">
+            <div class="p-6 md:p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 id="modal-title" class="text-2xl font-bold text-slate-900"></h3>
+                        <p id="modal-day" class="text-sm font-semibold text-blue-600 uppercase"></p>
+                    </div>
+                    <button id="close-modal" class="text-slate-400 hover:text-slate-600 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="modal-body" class="text-slate-700 space-y-4">
+                    <!-- Modal content will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const patientJourneyEvents = [
+            {
+                day: 1,
+                title: 'Program Start',
+                icon: '🚀',
+                content: `
+                    <p>Welcome to NimCore®! John's personalized THRIVE protocol has been finalized by his physician.</p>
+                    <div class="mt-4 p-4 bg-slate-100 rounded-lg">
+                        <p class="font-semibold">Action Items:</p>
+                        <ul class="list-disc list-inside mt-2 text-slate-600">
+                            <li>Medications (V-Vital + T-TrimCore) shipped via overnight courier.</li>
+                            <li>Patient dashboard unlocked with access to injection guides and resources.</li>
+                            <li>Wearable device (e.g., Oura Ring) integration prompted.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                day: 21,
+                title: 'Clinical Check-in',
+                icon: '💬',
+                content: `
+                    <p>A scheduled telehealth check-in with a NimCore® nurse to review progress and address any questions.</p>
+                    <div class="mt-4 p-4 bg-slate-100 rounded-lg">
+                        <p class="font-semibold">Key Discussion Points & Data:</p>
+                        <ul class="list-disc list-inside mt-2 text-slate-600">
+                            <li><strong>Patient Symptomology:</strong> John reports a noticeable increase in afternoon energy and reduced cravings. No adverse side effects noted.</li>
+                            <li><strong>Wearable Data Sync:</strong>
+                                <ul class="list-disc list-inside ml-5">
+                                    <li><strong>Sleep Score:</strong> Improved by 12% (Avg. 74 → 83)</li>
+                                    <li><strong>Resting Heart Rate:</strong> Decreased by 5bpm (Avg. 62 → 57)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Outcome:</strong> No dose titration needed at this time. Continue protocol as prescribed.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                day: 60,
+                title: 'Refill & Lab Reminder',
+                icon: '📧',
+                content: `
+                    <p>30 days before the 90-day renewal, automated reminders are sent to the patient to schedule their follow-up lab tests.</p>
+                    <div class="mt-4 space-y-4">
+                        <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+                            <p class="font-semibold text-blue-800">Mock Email Sent</p>
+                            <p class="text-sm text-blue-700 mt-1"><strong>Subject:</strong> Time to book your NimCore® follow-up labs!<br/>Hi John, you're 60 days into your journey! To ensure we can process your refill without delay, please use the link inside to schedule your lab draw for around Day 80.</p>
+                        </div>
+                        <div class="p-4 bg-green-50 border-l-4 border-green-400 rounded-r-lg">
+                            <p class="font-semibold text-green-800">Mock SMS Sent</p>
+                            <p class="text-sm text-green-700 mt-1">"NimCore Health: Hi John! It's time to schedule your 90-day labs. Please check your email for the booking link. Let us know if you need help!"</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                day: 80,
+                title: 'Labs & IntelliHealth™ Analysis',
+                icon: '🔬',
+                content: `
+                    <p>John completes his lab test. The results are automatically fed into the IntelliHealth™ engine for analysis against his goals and previous data.</p>
+                    <div class="mt-4 p-4 bg-slate-100 rounded-lg">
+                        <p class="font-semibold">Lab Results Received:</p>
+                        <table class="w-full mt-2 text-sm">
+                            <thead><tr class="text-left"><th class="py-1">Biomarker</th><th class="py-1">Result</th><th class="py-1">Optimal Range</th></tr></thead>
+                            <tbody>
+                                <tr class="border-t"><td class="py-1">Total Testosterone</td><td class="py-1 font-semibold">850 ng/dL</td><td class="py-1">700-1000 ng/dL</td></tr>
+                                <tr class="border-t"><td class="py-1">Estradiol (E2)</td><td class="py-1 font-semibold text-red-600">38.5 pg/mL</td><td class="py-1">20-35 pg/mL</td></tr>
+                                <tr class="border-t"><td class="py-1">HbA1c</td><td class="py-1 font-semibold text-green-600">5.4%</td><td class="py-1">< 5.7%</td></tr>
+                                <tr class="border-t"><td class="py-1">Hematocrit</td><td class="py-1 font-semibold">48%</td><td class="py-1">< 52%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 p-4 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
+                            <p class="font-semibold text-purple-800">IntelliHealth™ Titration Suggestion:</p>
+                            <p class="text-sm text-purple-700 mt-1">"Patient's Estradiol (38.5) is slightly above the optimal range. Testosterone and metabolic markers are excellent. <strong>RECOMMENDATION:</strong> Adjust Anastrozole from 'as needed' to a fixed dose of 0.25mg every 3 days to manage E2 conversion. No other changes needed."</p>
+                            <p class="text-xs text-purple-600 mt-2"><em>This recommendation is now sent to the physician for final review and approval.</em></p>
+                        </div>
+                `
+            },
+            {
+                day: 90,
+                title: 'Renewal & Refill',
+                icon: '✅',
+                content: `
+                    <p>The 90-day cycle concludes with the physician's approval and the processing of the next 90-day supply.</p>
+                     <div class="mt-4 p-4 bg-slate-100 rounded-lg">
+                        <p class="font-semibold">Action Items:</p>
+                        <ul class="list-disc list-inside mt-2 text-slate-600">
+                            <li>Physician reviews and approves the IntelliHealth™ suggestion.</li>
+                            <li>John is notified of the minor adjustment to his protocol.</li>
+                            <li>The next 90-day supply, with the updated Anastrozole instructions, is processed and shipped.</li>
+                            <li>The 90-day journey simulation resets for the next cycle.</li>
+                        </ul>
+                    </div>
+                `
+            }
+        ];
+
+        const timelineContainer = document.getElementById('timeline-events');
+        const modal = document.getElementById('event-modal');
+        const modalBackdrop = modal.querySelector('.modal-backdrop');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDay = document.getElementById('modal-day');
+        const modalBody = document.getElementById('modal-body');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        // Populate Timeline
+        patientJourneyEvents.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'flex flex-col items-center cursor-pointer group';
+            eventElement.innerHTML = `
+                <div class="z-10 bg-white border-4 border-blue-500 rounded-full w-12 h-12 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">${event.icon}</div>
+                <div class="mt-2 text-center">
+                    <p class="font-semibold text-slate-700">${event.title}</p>
+                    <p class="text-sm text-slate-500">Day ${event.day}</p>
+                </div>
+            `;
+            eventElement.addEventListener('click', () => openModal(event));
+            timelineContainer.appendChild(eventElement);
+        });
+
+        function openModal(event) {
+            modalTitle.textContent = event.title;
+            modalDay.textContent = `Day ${event.day}`;
+            modalBody.innerHTML = event.content;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.remove('scale-95');
+        }
+
+        function closeModal() {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.add('scale-95');
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+    </script>
+</body>
+</html>
